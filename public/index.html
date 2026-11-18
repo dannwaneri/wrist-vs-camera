@@ -1,0 +1,114 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Wrist vs Camera</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header>
+  <h1>Wrist vs Camera</h1>
+  <p class="sub">Count your own pulse. See if the camera agrees. See what leaves your computer.</p>
+</header>
+
+<div id="replayBanner" class="banner" hidden>Recorded session, not live. These are saved numbers from a real run. No camera is in use.</div>
+
+<!-- Step 1: key -->
+<section id="keyStep" class="card" hidden>
+  <h2>1. Add your Presage key</h2>
+  <p>This app uses the Presage SmartSpectra SDK. It needs a free API key from
+    <a href="https://physiology.presagetech.com/auth/register" target="_blank" rel="noopener">physiology.presagetech.com</a>.
+    The key stays in a file on this computer. The page never sees it again.</p>
+  <form id="keyForm">
+    <input id="keyInput" type="password" autocomplete="off" placeholder="Paste your API key" aria-label="API key">
+    <button type="submit">Save key</button>
+  </form>
+  <p class="err" id="keyErr"></p>
+  <p class="or">No key? <button id="replayBtn1" class="link">Watch a recorded session</button></p>
+</section>
+
+<!-- Step 2: setup -->
+<section id="setupStep" class="card" hidden>
+  <h2>2. Check your setup</h2>
+  <p>The app first asks the SDK's <b>Device Readiness</b> check whether this camera can measure here.
+    Then it measures how much your computer uploads while idle (20 s). Then the camera starts.</p>
+  <label>Camera <select id="cameraSel"></select></label>
+  <button id="refreshCams" class="link">Refresh</button>
+  <div class="row">
+    <button id="startBtn">Check and start</button>
+    <button id="replayBtn2" class="link">Watch a recorded session</button>
+    <button id="forgetKey" class="link">Remove saved key</button>
+  </div>
+  <details>
+    <summary>What worked in my tests</summary>
+    <ul>
+      <li>A laptop webcam at 10 fps failed. The SDK needs 25+ fps.</li>
+      <li>A phone used as a USB webcam gave 30 fps.</li>
+      <li>Window daylight worked. Fluorescent light on a generator did not.</li>
+      <li>Sit still. Only one face in view. Head and upper chest in the picture.</li>
+    </ul>
+  </details>
+</section>
+
+<!-- Live -->
+<section id="liveStep" hidden>
+  <div class="grid">
+    <div class="card">
+      <canvas id="preview" width="192" height="108" aria-label="Camera preview"></canvas>
+      <p id="phaseText" class="phase"></p>
+      <p id="hint" class="hint"></p>
+      <ul class="trust">
+        <li><span>Device Readiness</span><b id="readiness">-</b></li>
+        <li><span>Frame rate (needs 25+)</span><b id="fps">-</b></li>
+        <li><span>Upload now</span><b id="uploadNow">-</b></li>
+        <li><span>Upload verdict</span><b id="uploadVerdict">-</b></li>
+      </ul>
+      <p class="small" id="readinessReason"></p>
+      <button id="stopBtn" class="secondary">Stop</button>
+    </div>
+
+    <div class="card">
+      <h2>Camera reading</h2>
+      <p class="big"><span id="pulse">--</span> <small>bpm</small></p>
+      <p id="pulseLabel" class="label">waiting</p>
+      <p>Breathing: <b id="breath">--</b> per min</p>
+      <p class="small">Heart rate variability is not shown. In my tests its confidence never passed 10 of 100.</p>
+    </div>
+
+    <div class="card count">
+      <h2>Count your own pulse</h2>
+      <p id="countHelp">Put two fingers on your wrist, below the thumb. Press <b>Start</b>, then count the beats <b>in your head</b> for 60 seconds. Keep still. At the end, type your number.
+        <br><span class="small">Option: press the Space bar on each beat instead. In my test, tapping made me move and the camera lost quality.</span></p>
+      <button id="countStart">Start 60 s count</button>
+      <button id="beat" class="beat" disabled>Beat (optional)</button>
+      <p class="big"><span id="countTimer">60</span> <small>s</small> · <span id="taps">0</span> <small>taps</small></p>
+      <form id="countForm" hidden>
+        <label>How many beats did you count? <input id="countInput" type="number" min="20" max="250" required></label>
+        <button type="submit">Compare</button>
+      </form>
+      <div id="countResult"></div>
+      <h3>Your counts</h3>
+      <table id="history"><thead><tr><th>Your count</th><th>Camera median</th><th>Difference</th><th>Result</th></tr></thead><tbody></tbody></table>
+      <p class="small">Rule, fixed before testing: within ±5 bpm = agree. The camera median uses every pulse value in the same 60 s.</p>
+    </div>
+  </div>
+</section>
+
+<!-- Done -->
+<section id="doneStep" class="card" hidden>
+  <h2>Result</h2>
+  <div id="summary"></div>
+  <div class="row">
+    <button id="saveBtn">Save results (JSON)</button>
+    <button id="againBtn" class="secondary">New session</button>
+  </div>
+  <p class="small">Nothing is saved anywhere unless you press Save. No video or images are recorded.</p>
+</section>
+
+<footer>
+  <p>Not a medical device. Do not use it to diagnose or treat anything. One person tested it.</p>
+</footer>
+<script src="app.js"></script>
+</body>
+</html>

@@ -1,0 +1,4 @@
+node_modules/
+.presage-key
+sessions/*
+!sessions/.gitkeep

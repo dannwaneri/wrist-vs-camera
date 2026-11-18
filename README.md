@@ -4,9 +4,12 @@ Count your own pulse on your wrist. See if the camera agrees. See what leaves yo
 
 Built for the DEV Presage SmartSpectra SDK Challenge with `@smartspectra/node-sdk` 3.5.0.
 
-## How to test (under 3 minutes)
+## How to test
 
-You need Node.js 20 or newer.
+**1 minute, no install, no key:** open **https://dannwaneri.github.io/wrist-vs-camera/?replay**
+It plays saved numbers from a real session, labelled "Recorded session, not live". Use the 16x button to see the whole session in about 20 seconds.
+
+**Measure yourself (about 5 minutes).** You need Node.js 20+, a free Presage key, and a camera that gives 25+ fps. The SDK runs as native code, so live mode runs on your own computer:
 
 ```bash
 git clone https://github.com/dannwaneri/wrist-vs-camera.git
@@ -15,10 +18,6 @@ npm install
 npm start
 ```
 
-**Without a key (recorded session):** open http://localhost:4317/?replay
-This plays saved numbers from a real run. It is labelled "Recorded session, not live". No camera is used.
-
-**Live (needs a free Presage key and a camera that gives 25+ fps):**
 1. Open http://localhost:4317 and paste your key from https://physiology.presagetech.com/auth/register.
 2. Choose a camera and press **Check and start**. Device Readiness runs first, then a 20 s idle upload measurement.
 3. When a pulse shows, press **Start 60 s count**. Put two fingers on your wrist and count the beats in your head. Keep still. At 0, type your number and press **Compare**. (Option: press the Space bar on each beat.)

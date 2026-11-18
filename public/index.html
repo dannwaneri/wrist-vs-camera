@@ -14,6 +14,20 @@
 
 <div id="replayBanner" class="banner" hidden>Recorded session, not live. These are saved numbers from a real run. No camera is in use.</div>
 
+<!-- Hosted demo (no local app behind this page) -->
+<section id="hostedStep" class="card" hidden>
+  <h2>Try it in one minute, no install</h2>
+  <p>This page plays a <b>recorded session</b> from a real run: Device Readiness, frame rate, live pulse and breathing, the upload meter, and the end result. No camera, no key.</p>
+  <div class="row"><button id="replayBtn3">Watch the recorded session</button></div>
+  <h3>Measure yourself (about 5 minutes)</h3>
+  <p>Live measuring needs the app on your own computer, because the Presage SDK runs as native code there. You need Node.js 20+, a free Presage key, and a camera that gives 25+ fps.</p>
+  <pre>git clone https://github.com/dannwaneri/wrist-vs-camera.git
+cd wrist-vs-camera
+npm install
+npm start</pre>
+  <p class="small">Then open http://localhost:4317. Code and test results: <a href="https://github.com/dannwaneri/wrist-vs-camera">github.com/dannwaneri/wrist-vs-camera</a></p>
+</section>
+
 <!-- Step 1: key -->
 <section id="keyStep" class="card" hidden>
   <h2>1. Add your Presage key</h2>

@@ -1,6 +1,6 @@
 // UI for Wrist vs Camera. Live mode reads server events; replay mode plays a saved session file.
 const $ = id => document.getElementById(id);
-const show = (...ids) => ['keyStep', 'setupStep', 'liveStep', 'doneStep'].forEach(s => { $(s).hidden = !ids.includes(s); });
+const show = (...ids) => ['hostedStep', 'keyStep', 'setupStep', 'liveStep', 'doneStep'].forEach(s => { $(s).hidden = !ids.includes(s); });
 const COUNT_MS = 60000, AGREE_BPM = 5;
 
 const READINESS_TEXT = {
@@ -200,7 +200,9 @@ $('stopBtn').onclick = () => mode === 'live' ? fetch('/api/stop', { method: 'POS
 
 // ---------- live mode ----------
 async function initLive() {
-  const st = await fetch('/api/state').then(r => r.json());
+  // No local app behind this page (for example the hosted demo): offer the replay.
+  const st = await fetch('/api/state').then(r => r.ok ? r.json() : null).catch(() => null);
+  if (!st) return show('hostedStep');
   const es = new EventSource('/events');
   for (const t of ['phase', 'readiness', 'status', 'fps', 'upload', 'metrics', 'frame', 'sdkError']) {
     es.addEventListener(t, e => { if (mode === 'live') handle(t, JSON.parse(e.data)); });
@@ -237,14 +239,14 @@ $('startBtn').onclick = async () => {
 };
 
 // ---------- replay mode ----------
+let replayFile = null;
 let replaySpeed = Number(new URLSearchParams(location.search).get('speed')) || 4, replayT0 = 0, replayWall0 = 0;
 const replayClock = () => replayT0 + (Date.now() - replayWall0) * replaySpeed;
 async function startReplay() {
   const file = await fetch('replay/sample.json').then(r => r.ok ? r.json() : null).catch(() => null);
   if (!file) { alert('No recorded session is bundled yet.'); return; }
-  mode = 'replay'; state = freshState(); state.camera = file.camera;
+  mode = 'replay'; state = freshState(); state.camera = file.camera; replayFile = file;
   $('replayBanner').hidden = false;
-  $('replayBanner').textContent = `Recorded session, not live (${replaySpeed}x speed). Saved numbers from a real run on ${file.recordedOn ?? 'a test day'}. No camera is in use and no key is needed.`;
   $('stopBtn').textContent = 'Leave replay';
   for (const id of ['readiness', 'fps', 'uploadNow', 'uploadVerdict', 'hint', 'readinessReason']) { $(id).textContent = '-'; $(id).className = ''; }
   $('hint').textContent = '';
@@ -252,9 +254,8 @@ async function startReplay() {
   $('countHelp').textContent = file.events.some(e => e.type === 'count')
     ? 'In this recording, each tap on the wrist pulse appears below as it happened.'
     : 'This recording has no hand count. Run the app with your own key to try the count.';
-  const c = $('preview').getContext('2d');
-  c.fillStyle = '#000'; c.fillRect(0, 0, 192, 108); c.fillStyle = '#bbb'; c.font = '11px system-ui'; c.textAlign = 'center';
-  c.fillText('No video in a replay.', 96, 50); c.fillText('Images are never saved.', 96, 66);
+  $('preview').hidden = true;
+  $('preview').insertAdjacentHTML('afterend', '<p class="small">No video in a replay. The app never saves images.</p>');
   // Expand each saved count into its start and tap events so the count can be watched.
   const ev = [];
   for (const e of file.events) {
@@ -265,7 +266,7 @@ async function startReplay() {
     ev.push(e);
   }
   ev.sort((a, b) => a.t - b.t);
-  replayT0 = ev[0].t; replayWall0 = Date.now();
+  replayT0 = ev[0].t; replayWall0 = Date.now(); renderBanner();
   let i = 0;
   (function step() {
     while (i < ev.length && ev[i].t <= replayClock()) {
@@ -275,6 +276,14 @@ async function startReplay() {
     }
     if (i < ev.length && mode === 'replay') setTimeout(step, 50);
   })();
+}
+$('replayBtn3').onclick = startReplay;
+function setSpeed(n) { replayT0 = replayClock(); replayWall0 = Date.now(); replaySpeed = n; renderBanner(); }
+function renderBanner() {
+  const b = $('replayBanner');
+  b.innerHTML = `Recorded session, not live. Saved numbers from a real run on ${escapeHtml(replayFile?.recordedOn ?? 'a test day')}. No camera is in use and no key is needed. `
+    + 'Speed: ' + [1, 4, 16].map(n => `<button class="speed${n === replaySpeed ? ' on' : ''}" data-speed="${n}">${n}x</button>`).join(' ');
+  b.querySelectorAll('button').forEach(btn => { btn.onclick = () => setSpeed(Number(btn.dataset.speed)); });
 }
 $('replayBtn1').onclick = startReplay;
 $('replayBtn2').onclick = startReplay;

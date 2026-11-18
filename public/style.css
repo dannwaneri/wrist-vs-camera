@@ -38,6 +38,9 @@ canvas { width: 100%; aspect-ratio: 16 / 9; background: #000; border-radius: 8px
 .big small { font-size: 1rem; font-weight: 400; color: var(--muted); }
 .label { margin: 0 0 8px; font-weight: 600; }
 a { color: var(--accent); }
+pre { background: var(--bg); border: 1px solid var(--line); border-radius: 8px; padding: 10px; overflow-x: auto; font-size: .9rem; }
+.banner .speed { padding: 2px 10px; margin-left: 4px; background: transparent; color: inherit; border: 1px solid currentColor; }
+.banner .speed.on { background: var(--text); color: var(--bg); }
 .good { color: var(--good); } .bad { color: var(--bad); } .warn { color: var(--warn); }
 .beat { display: block; width: 100%; padding: 28px; font-size: 1.3rem; margin-top: 10px; }
 .beat.flash { filter: brightness(1.3); }

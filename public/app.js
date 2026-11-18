@@ -35,7 +35,7 @@ function handle(type, d) {
       state.readiness = d;
       const [txt, cls] = READINESS_TEXT[d.verdict] ?? [d.verdict, 'warn'];
       $('readiness').textContent = txt; $('readiness').className = cls;
-      $('readinessReason').textContent = d.reason ?? '';
+      $('readinessReason').textContent = d.reason ? `SDK note: "${d.reason}"` : '';
       break;
     }
     case 'status':
@@ -173,9 +173,15 @@ function finish(d) {
   const pm = median(state.pulses.map(p => p.value)), bm = median(state.breaths.map(b => b.value));
   const stablePct = state.pulses.length ? Math.round(100 * state.pulses.filter(p => p.stable).length / state.pulses.length) : null;
   const u = state.upload ?? {};
+  // Headline: the one question the app answers. Shown first, large.
+  const last = state.counts[state.counts.length - 1];
+  const head = !last ? ['No pulse count in this session', `Camera median ${pm == null ? '-' : pm.toFixed(1) + ' bpm'}. Count your own pulse to check it.`, '']
+    : last.agree == null ? ['Not judged', `No camera pulse during your count of ${last.count}.`, 'warn']
+      : [last.agree ? 'Camera agrees with your wrist' : 'Camera disagrees with your wrist',
+        `You counted ${last.count}. Camera median ${last.cameraMedian}. ${Math.abs(last.diff)} bpm apart (limit ±${AGREE_BPM}).`, last.agree ? 'good' : 'bad'];
   const rows = [
     ['Camera', state.camera ?? '-'],
-    ['Device Readiness', state.readiness ? `${state.readiness.verdict}: ${state.readiness.reason}` : '-'],
+    ['Device Readiness', state.readiness ? `${(READINESS_TEXT[state.readiness.verdict] ?? [state.readiness.verdict])[0]} (SDK note: "${state.readiness.reason}")` : '-'],
     ['Median frame rate', state.fps.length ? `${median(state.fps)} fps` : '-'],
     ['Camera pulse median (whole session)', pm == null ? '-' : `${pm.toFixed(1)} bpm, ${stablePct}% of values stable`],
     ['Breathing median', bm == null ? '-' : `${bm.toFixed(1)} per min`],
@@ -183,7 +189,8 @@ function finish(d) {
     ['Your counts', state.counts.length ? state.counts.map(c => `${c.count} vs ${c.cameraMedian ?? '-'} (${c.agree == null ? 'not judged' : c.agree ? 'agree' : 'disagree'})`).join('; ') : 'none'],
     ['Ended', d.reason],
   ];
-  $('summary').innerHTML = '<table>' + rows.map(([k, v]) => `<tr><th>${k}</th><td>${escapeHtml(String(v))}</td></tr>`).join('') + '</table>';
+  $('summary').innerHTML = `<div class="verdict ${head[2]}"><p class="verdict-title">${escapeHtml(head[0])}</p><p>${escapeHtml(head[1])}</p></div>`
+    + '<table>' + rows.filter(([, v]) => v !== '-').map(([k, v]) => `<tr><th>${k}</th><td>${escapeHtml(String(v))}</td></tr>`).join('') + '</table>';
   $('saveBtn').hidden = mode === 'replay';
   show('doneStep');
 }

@@ -48,3 +48,9 @@ table { width: 100%; border-collapse: collapse; font-variant-numeric: tabular-nu
 th, td { text-align: left; padding: 6px 4px; border-bottom: 1px solid var(--line); font-size: .92rem; }
 #countResult { font-size: 1.05rem; min-height: 1.5em; }
 details { margin-top: 12px; }
+/* Result headline: the app's one answer, shown first */
+.verdict { border: 1px solid var(--line); border-left: 6px solid var(--muted); border-radius: 10px; padding: 12px 14px; margin: 0 0 14px; background: var(--bg); color: var(--text); }
+.verdict.good { border-left-color: var(--good); } .verdict.bad { border-left-color: var(--bad); } .verdict.warn { border-left-color: var(--warn); }
+.verdict p { margin: 4px 0; }
+.verdict-title { font-size: 1.35rem; font-weight: 700; }
+.verdict.good .verdict-title { color: var(--good); } .verdict.bad .verdict-title { color: var(--bad); } .verdict.warn .verdict-title { color: var(--warn); }

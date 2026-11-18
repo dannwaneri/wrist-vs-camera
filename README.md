@@ -65,3 +65,7 @@ Every run, including the failed ones, is in `results/runs.csv`.
 - The hand count is itself a rough reference. A missed beat changes it.
 - The upload meter counts all traffic from the computer. Other apps can push it up. Close cloud sync and video before a session.
 - The macOS and Linux upload meters are written but not tested.
+
+## License
+
+MIT for this app's code (see `LICENSE`). The SmartSpectra SDK is installed from npm and has its own license from Presage Technologies.

@@ -2,6 +2,7 @@
   "name": "presage-entry",
   "version": "0.1.0",
   "private": true,
+  "license": "MIT",
   "description": "Count your own pulse against a camera pulse reading, after a setup check and with a live upload meter.",
   "type": "module",
   "main": "server.mjs",

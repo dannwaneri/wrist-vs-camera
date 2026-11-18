@@ -9,8 +9,8 @@ Built for the DEV Presage SmartSpectra SDK Challenge with `@smartspectra/node-sd
 You need Node.js 20 or newer.
 
 ```bash
-git clone <repo-url>
-cd presage-entry
+git clone https://github.com/dannwaneri/wrist-vs-camera.git
+cd wrist-vs-camera
 npm install
 npm start
 ```

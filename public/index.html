@@ -47,7 +47,7 @@ npm start</pre>
   <h2>2. Check your setup</h2>
   <p>The app first measures how much your computer uploads while idle (20 s, camera off). Then the SDK's <b>Device Readiness</b> check asks whether this camera can measure here.
     Then the measurement starts.</p>
-  <p class="small"><b>What leaves this computer:</b> no video or images. The SDK sends your key check and usage to Presage. Presage's docs say it also sends your pulse, HRV and breathing numbers to Presage about once a minute, for its <a href="https://smartspectra.presagetech.com/docs/llm-insights" target="_blank" rel="noopener">LLM Insights</a> feature. I found no setting to turn that off.</p>
+  <p class="small"><b>What leaves this computer:</b> no video or images. The SDK sends your key check and usage to Presage. Presage's docs say it also sends your measured numbers (this app requests pulse and breathing, not HRV) to Presage about once a minute, for its <a href="https://smartspectra.presagetech.com/docs/llm-insights" target="_blank" rel="noopener">LLM Insights</a> feature. I found no setting to turn that off.</p>
   <label>Camera <select id="cameraSel"></select></label>
   <button id="refreshCams" class="link">Refresh</button>
   <div class="row">

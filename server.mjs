@@ -10,7 +10,7 @@ import { fileURLToPath } from 'node:url';
 const require = createRequire(import.meta.url);
 const {
   SmartSpectraSDK, CameraSelection, ValidationCode, SmartSpectraErrorCode, PixelFormat,
-  breathingMetrics, cardioMetrics,
+  breathingMetrics, cardioMetrics, MetricType,
 } = require('@smartspectra/node-sdk');
 const { decodeMetrics, Metrics } = require('@smartspectra/node-sdk/messages');
 
@@ -47,31 +47,51 @@ function sentBytes() {
   return new Promise(resolve => {
     if (process.platform === 'win32') {
       execFile('powershell', ['-NoProfile', '-Command',
-        '(Get-NetAdapterStatistics | Measure-Object -Property SentBytes -Sum).Sum'],
-        { windowsHide: true }, (err, out) => resolve(err ? null : Number(String(out).trim()) || null));
+        'Get-NetAdapterStatistics | ForEach-Object { "$($_.Name)`t$($_.SentBytes)" }'],
+        { windowsHide: true }, (err, out) => {
+          if (err) return resolve(null);
+          const m = {};
+          for (const line of String(out).split(/\r?\n/)) { const [n, v] = line.split('\t'); if (n && v) m[n] = Number(v) || 0; }
+          resolve(Object.keys(m).length ? m : null);
+        });
     } else if (process.platform === 'darwin') {
       execFile('netstat', ['-ib'], (err, out) => {
         if (err) return resolve(null);
-        const seen = new Set(); let sum = 0;
+        const m = {};
         for (const line of String(out).split('\n').slice(1)) {
           const c = line.trim().split(/\s+/);
-          if (c.length < 10 || c[0].startsWith('lo') || seen.has(c[0])) continue;
-          seen.add(c[0]); sum += Number(c[c.length - 2]) || 0; // Obytes column
+          if (c.length < 10 || c[0].startsWith('lo') || c[0] in m) continue;
+          m[c[0]] = Number(c[c.length - 2]) || 0; // Obytes column
         }
-        resolve(sum);
+        resolve(m);
       });
     } else {
       fs.readFile('/proc/net/dev', 'utf8', (err, txt) => {
         if (err) return resolve(null);
-        let sum = 0;
+        const m = {};
         for (const line of txt.split('\n').slice(2)) {
           const [name, rest] = line.split(':'); if (!rest || name.trim() === 'lo') continue;
-          sum += Number(rest.trim().split(/\s+/)[8]) || 0;
+          m[name.trim()] = Number(rest.trim().split(/\s+/)[8]) || 0;
         }
-        resolve(sum);
+        resolve(m);
       });
     }
   });
+}
+// Bytes sent between two samples, adapter by adapter. An adapter that appears or
+// disappears (for example a phone on USB) must not make the total jump or go negative.
+// Measured 2026-11-20: the plain sum fell by 215-421 MB when an adapter went away.
+function sentBetween(a, z) {
+  let d = 0;
+  for (const [name, bytes] of Object.entries(z.bytes)) {
+    if (name in a.bytes) d += Math.max(0, bytes - a.bytes[name]);
+  }
+  return d;
+}
+function sentOver(samples) {
+  let d = 0;
+  for (let i = 1; i < samples.length; i++) d += sentBetween(samples[i - 1], samples[i]);
+  return d;
 }
 const meter = { samples: [] }; // { t, bytes }
 async function meterTick() {
@@ -80,15 +100,14 @@ async function meterTick() {
   meter.samples.push({ t: Date.now(), bytes: b });
   if (meter.samples.length > 400) meter.samples.shift();
   const s = meter.samples; if (s.length < 2) return;
-  const a = s[Math.max(0, s.length - 3)], z = s[s.length - 1];
-  const nowMBmin = (z.bytes - a.bytes) / 1e6 / ((z.t - a.t) / 60000);
+  const recent = s.slice(Math.max(0, s.length - 3));
+  const nowMBmin = sentOver(recent) / 1e6 / ((recent.at(-1).t - recent[0].t) / 60000);
   send('upload', { nowMBmin: round(nowMBmin, 2), ...uploadVerdict() });
 }
 function rateBetween(t0, t1) {
   const s = meter.samples.filter(x => x.t >= t0 && x.t <= t1);
   if (s.length < 2) return null;
-  const a = s[0], z = s[s.length - 1];
-  return (z.bytes - a.bytes) / 1e6 / ((z.t - a.t) / 60000);
+  return sentOver(s) / 1e6 / ((s.at(-1).t - s[0].t) / 60000);
 }
 function uploadVerdict(s = session) {
   if (s?.baseline == null || !s.startedAt) return { verdict: null };
@@ -110,7 +129,10 @@ let session = null; // { sdk, phase, cameraName, record, startedAt, baseline, ..
 function makeSdk() {
   return new SmartSpectraSDK({
     apiKey: readKey(),
-    requestedMetrics: [...breathingMetrics, ...cardioMetrics],
+    // No HRV: the app does not show it (confidence never passed 10 in my tests), and Device
+    // Readiness asked to "reduce the requested workload". Fewer metrics also means fewer
+    // numbers in the SDK's automatic vitals snapshots to Presage.
+    requestedMetrics: [...breathingMetrics, ...cardioMetrics.filter(m => m !== MetricType.HRV)],
     enableTelemetry: false,
   });
 }

@@ -63,6 +63,7 @@ function handle(type, d) {
     case 'frame': drawFrame(d); break;
     case 'sdkError':
       $('hint').textContent = `Error: ${d.message}`;
+      state.lastError = d.message;
       break;
     case 'countStart': beginCount(d.t); break;
     case 'tap': tap(d.t); break;
@@ -182,12 +183,12 @@ function finish(d) {
   const rows = [
     ['Camera', state.camera ?? '-'],
     ['Device Readiness', state.readiness ? `${(READINESS_TEXT[state.readiness.verdict] ?? [state.readiness.verdict])[0]} (SDK note: "${state.readiness.reason}")` : '-'],
-    ['Median frame rate', state.fps.length ? `${median(state.fps)} fps` : '-'],
+    ['Frame rate', state.fps.filter(f => f > 0).length ? `median ${median(state.fps.filter(f => f > 0))} fps, lowest ${Math.min(...state.fps.filter(f => f > 0))} fps (needs 25+)` : '-'],
     ['Camera pulse median (whole session)', pm == null ? '-' : `${pm.toFixed(1)} bpm, ${stablePct}% of values stable`],
     ['Breathing median', bm == null ? '-' : `${bm.toFixed(1)} per min`],
     ['Upload', u.verdict && u.verdict !== 'measuring' ? `${u.verdict}: idle ${u.baselineMBmin}, session ${u.sessionMBmin}, extra ${u.extraMBmin} MB/min` : 'not judged (session under 30 s)'],
     ['Your counts', state.counts.length ? state.counts.map(c => `${c.count} vs ${c.cameraMedian ?? '-'} (${c.agree == null ? 'not judged' : c.agree ? 'agree' : 'disagree'})`).join('; ') : 'none'],
-    ['Ended', d.reason],
+    ['Ended', state.lastError ? `${d.reason}. Before that, the SDK said: "${state.lastError}"` : d.reason],
   ];
   $('summary').innerHTML = `<div class="verdict ${head[2]}"><p class="verdict-title">${escapeHtml(head[0])}</p><p>${escapeHtml(head[1])}</p></div>`
     + '<table>' + rows.filter(([, v]) => v !== '-').map(([k, v]) => `<tr><th>${k}</th><td>${escapeHtml(String(v))}</td></tr>`).join('') + '</table>';

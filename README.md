@@ -52,7 +52,8 @@ Every run, including the failed ones, is in `results/runs.csv`.
 
 - **The camera runs only after you press Check and start**, and stops when you press Stop or close the app.
 - **Processing is on this computer.** The SDK processes video locally. The app turns SDK telemetry off (`enableTelemetry: false`).
-- **What goes to Presage:** the SDK checks your API key and reports usage to Presage's servers. It does not send video (measured: see the upload meter and my results above). This test cannot exclude a very small upload, such as a few numbers.
+- **What goes to Presage:** the SDK checks your API key and reports usage to Presage's servers. It does not send video (measured: see the upload meter and my results above).
+- **Your vital numbers also go to Presage.** Presage's [LLM Insights page](https://smartspectra.presagetech.com/docs/llm-insights) says the SDK "automatically dispatches vitals snapshots" (pulse rate, HRV and breathing rate) during a session: one at the first stable reading of each, then one every 60 seconds. It says raw video and face images are never sent. I found no setting to turn this off. The upload meter cannot see something this small.
 - **What the app stores:** your API key in a file named `.presage-key` in the app folder (delete it with "Remove saved key"). A session record with numbers only (no images) in `sessions/`, plus `sessions/errors.log` if the app hits an error. Nothing else, unless you press "Save results".
 - **The preview** is a small, low-resolution image sent from the local server to your own browser tab on 127.0.0.1. It never leaves your computer.
 - **The server listens only on 127.0.0.1** and refuses requests for other host names.

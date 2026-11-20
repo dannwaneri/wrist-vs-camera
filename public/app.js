@@ -10,8 +10,8 @@ const READINESS_TEXT = {
   inconclusive: ['Could not decide', 'warn'],
 };
 const PHASE_TEXT = {
-  readiness: 'Step 1 of 3: Device Readiness check (about 10 s). Face the camera.',
-  baseline: 'Step 2 of 3: measuring idle upload for 20 s. Sit still, do not use the computer.',
+  baseline: 'Step 1 of 3: measuring idle upload for 20 s. The camera is off. Do not use the computer.',
+  readiness: 'Step 2 of 3: Device Readiness check (about 10 s). Face the camera.',
   measuring: 'Step 3 of 3: measuring. Sit still and face the camera.',
 };
 

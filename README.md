@@ -19,7 +19,7 @@ npm start
 ```
 
 1. Open http://localhost:4317 and paste your key from https://physiology.presagetech.com/auth/register.
-2. Choose a camera and press **Check and start**. Device Readiness runs first, then a 20 s idle upload measurement.
+2. Choose a camera and press **Check and start**. A 20 s idle upload measurement runs first (camera off), then Device Readiness.
 3. When a pulse shows, press **Start 60 s count**. Put two fingers on your wrist and count the beats in your head. Keep still. At 0, type your number and press **Compare**. (Option: press the Space bar on each beat.)
 4. Read the result: your count vs the camera median for the same 60 s.
 

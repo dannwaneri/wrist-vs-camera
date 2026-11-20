@@ -97,7 +97,7 @@ function uploadVerdict(s = session) {
   const extra = Math.max(0, sess - s.baseline);
   const verdict = extra < LOCAL_MAX_MB_PER_MIN ? 'no video stream uploaded'
     : extra > UPLOAD_MIN_MB_PER_MIN ? 'video likely uploaded' : 'unclear';
-  return { verdict, baselineMBmin: round(session.baseline, 2), sessionMBmin: round(sess, 2), extraMBmin: round(extra, 2) };
+  return { verdict, baselineMBmin: round(s.baseline, 2), sessionMBmin: round(sess, 2), extraMBmin: round(extra, 2) };
 }
 setInterval(meterTick, 3000);
 meterTick();
@@ -178,23 +178,25 @@ async function startSession(cameraIndex) {
   const sdk = makeSdk();
   session = { sdk, phase: 'readiness', cameraName: cam.name, record: [], stamp: new Date().toISOString().replace(/[:.]/g, '-') };
   session.unwire = wire(sdk);
+  // Idle upload baseline first, with the camera still closed.
+  // Then Device Readiness, then start at once: the USB phone webcam dropped
+  // 3 times when the camera reopened 20 s after the readiness check.
+  session.phase = 'baseline';
+  send('phase', { phase: 'baseline', seconds: 20, camera: cam.name });
+  const t0 = Date.now();
+  await sleep(20000);
+  if (!session) return;
+  session.baseline = rateBetween(t0, Date.now()) ?? 0;
+
+  session.phase = 'readiness';
   send('phase', { phase: 'readiness', camera: cam.name });
   sdk.useCamera(CameraSelection.byId(cam.id), { width: 1280, height: 720 });
-
   let readiness;
   try { readiness = await sdk.checkDeviceReadiness(); }
   catch (e) { readiness = { verdict: 'inconclusive', reason: e.message }; }
   send('readiness', { verdict: readiness.verdict, reason: readiness.reason });
   if (!session) return;
   if (readiness.verdict === 'blocked') { await stopSession('blocked by Device Readiness'); return; }
-
-  // Idle upload baseline before the camera session starts.
-  session.phase = 'baseline';
-  send('phase', { phase: 'baseline', seconds: 20 });
-  const t0 = Date.now();
-  await sleep(20000);
-  if (!session) return;
-  session.baseline = rateBetween(t0, Date.now()) ?? 0;
 
   session.phase = 'measuring';
   session.startedAt = Date.now();

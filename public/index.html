@@ -45,8 +45,8 @@ npm start</pre>
 <!-- Step 2: setup -->
 <section id="setupStep" class="card" hidden>
   <h2>2. Check your setup</h2>
-  <p>The app first asks the SDK's <b>Device Readiness</b> check whether this camera can measure here.
-    Then it measures how much your computer uploads while idle (20 s). Then the camera starts.</p>
+  <p>The app first measures how much your computer uploads while idle (20 s, camera off). Then the SDK's <b>Device Readiness</b> check asks whether this camera can measure here.
+    Then the measurement starts.</p>
   <p class="small"><b>What leaves this computer:</b> no video or images. The SDK sends your key check and usage to Presage. Presage's docs say it also sends your pulse, HRV and breathing numbers to Presage about once a minute, for its <a href="https://smartspectra.presagetech.com/docs/llm-insights" target="_blank" rel="noopener">LLM Insights</a> feature. I found no setting to turn that off.</p>
   <label>Camera <select id="cameraSel"></select></label>
   <button id="refreshCams" class="link">Refresh</button>

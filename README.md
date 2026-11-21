@@ -34,6 +34,22 @@ Platforms: Windows x64, macOS Apple Silicon, Linux x64 (the platforms the SDK su
 
 Heart rate variability is not shown. In my tests its confidence never passed 10 of 100.
 
+## Screenshots
+
+From the recorded session of Nov 20 (the hosted replay). Real numbers, no images of me: the app never saves video.
+
+**Live view.** Device Readiness says "limited". The frame rate is still 30, and the pulse is marked stable. No video is uploaded.
+
+![Live view: Device Readiness limited, 29.6 fps, pulse 79 marked stable, no video stream uploaded](docs/img/2-live.png)
+
+**About a minute later.** The laptop slowed down. The frame rate fell to 16.4, the pulse is no longer stable, and the SDK stopped the session. Device Readiness had warned about this.
+
+![The frame rate fell to 16.4 fps, the pulse is not stable, and the SDK stopped](docs/img/3-sdk-stopped.png)
+
+**Result screen.** It shows what happened, not only the numbers: no count, the lowest frame rate, the upload verdict and the SDK's own reason.
+
+![Result screen: no pulse count, frame rate median 29.9 lowest 14.8, no video stream uploaded, SDK stop reason](docs/img/4-result.png)
+
 ## My test results (one person, at home in Nigeria, November 2026)
 
 | Date | Camera | Light / power | Result |

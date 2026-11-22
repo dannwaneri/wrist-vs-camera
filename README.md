@@ -67,7 +67,7 @@ Every run, including the failed ones, is in `results/runs.csv`.
 
 ## Consent and data handling
 
-- **The camera runs only after you press Check and start**, and stops when you press Stop or close the app.
+- **The camera runs only after you press Check and start**, and stops when you press Stop or close the PowerShell window that runs the app. Closing only the browser tab does not stop the camera: press Stop first.
 - **Processing is on this computer.** The SDK processes video locally. The app turns SDK telemetry off (`enableTelemetry: false`).
 - **What goes to Presage:** the SDK checks your API key and reports usage to Presage's servers. It does not send video (measured: see the upload meter and my results above).
 - **Your vital numbers also go to Presage.** Presage's [LLM Insights page](https://smartspectra.presagetech.com/docs/llm-insights) says the SDK "automatically dispatches vitals snapshots" (pulse rate, HRV and breathing rate) during a session: one at the first stable reading of each, then one every 60 seconds. It says raw video and face images are never sent. This app does not request HRV, so only pulse and breathing are measured. I found no setting to turn the snapshots off. The upload meter cannot see something this small.

@@ -4,6 +4,12 @@ Count your own pulse on your wrist. See if the camera agrees. See what leaves yo
 
 Built for the DEV Presage SmartSpectra SDK Challenge with `@smartspectra/node-sdk` 3.5.0.
 
+## Demo video (2:51)
+
+[![Wrist vs Camera demo video on YouTube](https://img.youtube.com/vi/j82oykg4k90/hqdefault.jpg)](https://youtu.be/j82oykg4k90)
+
+The first 42 seconds are the live app on my laptop (Nov 22, night): Device Readiness "ready", my camera picture, a live pulse with the stable flag, and the result. The rest is a narrated replay of a real session from Nov 20. I blurred my face in the camera preview because the video is public. The app itself never saves or uploads images.
+
 ## How to test
 
 **1 minute, no install, no key:** open **https://dannwaneri.github.io/wrist-vs-camera/?replay**

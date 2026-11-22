@@ -61,6 +61,7 @@ From the recorded session of Nov 20 (the hosted replay). Real numbers, no images
 | Nov 16 | Pixel 6 Pro as USB webcam, 300 s | Window | Camera median 74.4 bpm. My 60 s hand counts: 70 before, 65 after (average 67.5). **6.9 bpm apart: fails my ±5 rule** |
 | Nov 18 | This app, USB webcam | Window | Ready, 30.1 fps, extra upload 0.08 MB/min. I tapped each beat: 53 vs camera 79.2. **Disagree.** Only 7 of 32 camera values were stable while I tapped, so the default is now "count in your head" |
 | Nov 18 | This app, USB webcam | Window | Counted in my head: 63. Not compared: a bug in my code crashed the app before it saved the count. Fixed |
+| Nov 22 | This app, USB webcam, charger in, no HRV requested | Night | Device Readiness: ready. 30 fps for 3 minutes, pulse median 74.4 (80% stable), extra upload 0.07 MB/min. No count. Several things changed at once, so the cause is not known |
 | Nov 20 | This app, USB webcam, 5 tries | Afternoon | Device Readiness: limited, 5 of 5 ("reduce the requested workload or contention"). In the 3 sessions that ran, the frame rate fell from 30 to 15-20 after 25-65 s and the SDK stopped. No count could finish. This session is the hosted replay |
 
 Every run, including the failed ones, is in `results/runs.csv`.
